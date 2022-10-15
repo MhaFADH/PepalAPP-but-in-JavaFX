@@ -31,6 +31,8 @@ public class LoginController implements Initializable {
     public static String username = "";
     public static String password = "";
 
+    public static HashMap<String,String> cookie = new HashMap<>();
+
 
     @FXML
     private ImageView imageView;
@@ -57,7 +59,7 @@ public class LoginController implements Initializable {
 
             Document loginDoc = response.parse();
 
-            HashMap<String,String> cookies = new HashMap<>(response.cookies());
+            cookie = new HashMap<>(response.cookies());
 
 
 
@@ -66,7 +68,7 @@ public class LoginController implements Initializable {
             formData.put("pass", password);
 
             Connection.Response homePage = Jsoup.connect("https://www.pepal.eu/include/php/ident.php")
-                    .cookies(cookies)
+                    .cookies(cookie)
                     .data(formData)
                     .method(Connection.Method.POST)
                     .execute();

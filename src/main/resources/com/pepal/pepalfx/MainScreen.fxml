@@ -3,31 +3,43 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="459.0" style="-fx-background-color: #3c81bc;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="602.0" style="-fx-background-color: #3c81bc;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pepal.pepalfx.MainScreenController">
    <children>
-      <TextArea editable="false" layoutX="175.0" layoutY="14.0" prefHeight="343.0" prefWidth="270.0" text="dssdfsdfsdf">
+      <TextArea fx:id="noteField" editable="false" layoutX="175.0" layoutY="14.0" prefHeight="343.0" prefWidth="416.0" text="dssdfsdfsdf">
          <font>
-            <Font name="System Bold Italic" size="13.0" />
+            <Font name="System Bold Italic" size="12.0" />
          </font>
+         <effect>
+            <DropShadow color="#00000087" />
+         </effect>
       </TextArea>
-      <TextField editable="false" layoutX="175.0" layoutY="361.0" prefHeight="25.0" prefWidth="270.0" text="sdfsdfsdfs">
+      <TextField fx:id="moyField" editable="false" layoutX="175.0" layoutY="364.0" prefHeight="25.0" prefWidth="270.0" text="sdfsdfsdfs">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
+         <effect>
+            <DropShadow color="#00000086" />
+         </effect>
       </TextField>
-      <Button layoutX="35.0" layoutY="14.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" style="-fx-background-color: white;" text="Actualiser">
+      <Button fx:id="buttonAct" layoutX="35.0" layoutY="14.0" mnemonicParsing="false" onAction="#act" prefHeight="36.0" prefWidth="110.0" stylesheets="@BUTTONMa.css" text="Actualiser">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <effect>
+            <DropShadow color="#00000081" />
+         </effect>
       </Button>
-      <Button layoutX="35.0" layoutY="75.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" style="-fx-background-color: white;" text="Valider présence">
+      <Button fx:id="buttonPres" layoutX="35.0" layoutY="75.0" mnemonicParsing="false" onAction="#pres" prefHeight="36.0" prefWidth="110.0" stylesheets="@BUTTONMa.css" text="Valider présence">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <effect>
+            <DropShadow color="#00000087" />
+         </effect>
       </Button>
    </children>
 </Pane>

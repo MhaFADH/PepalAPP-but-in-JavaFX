@@ -11,8 +11,6 @@ import java.io.IOException;
 
 public class HelloApplication extends Application {
 
-    static String username = "";
-
 
 
     @Override
@@ -31,7 +29,7 @@ public class HelloApplication extends Application {
     public void mainScreen(Stage primaryStage) throws IOException {
 
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
-        Scene scene = new Scene(root, 600, 550);
+        Scene scene = new Scene(root, 602, 400);
         scene.setFill(Color.web("#3c81bc"));
         primaryStage.setTitle("Pepal");
         primaryStage.setScene(scene);
