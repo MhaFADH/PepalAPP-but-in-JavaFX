@@ -19,9 +19,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 import static com.pepal.pepalfx.LoginController.username;
 import static com.pepal.pepalfx.LoginController.password;
@@ -30,7 +28,6 @@ import static com.pepal.pepalfx.LoginController.cookie;
 
 
 public class MainScreenController implements Initializable {
-    private float sumNotes;
 
     @FXML
     private Button buttonAct;
@@ -78,6 +75,7 @@ public class MainScreenController implements Initializable {
         stage.close();
 
         helloApplication.mainScreen(new Stage());
+        orgaNotes();
 
 
 
@@ -95,23 +93,8 @@ public class MainScreenController implements Initializable {
     }
 
 
-
-
-
-
-
-
-
-
-
-
     public void pres(ActionEvent e) throws IOException {
         String msg = "Vous avez déjà été noté présent, ou alors l'appel a été clôturé" ;
-        Alert alertt = new Alert(Alert.AlertType.INFORMATION);
-        alertt.setTitle("Validation failed");
-        alertt.setHeaderText(null);
-        alertt.setContentText(msg);
-        alertt.showAndWait();
 
         Document presPage;
         try {
@@ -128,6 +111,8 @@ public class MainScreenController implements Initializable {
         for (int i = 0;i<=hrefPres.size()-1;i++){
             hrefLinks[i] = hrefPres.get(i);
         }
+
+        Elements noCours = presPage.getElementsByClass("alert alert-danger");
 
         String matin = hrefLinks[0].attr("href").replace("/presences/s/","");
         String aprem = hrefLinks[1].attr("href").replace("/presences/s/","");
@@ -214,8 +199,11 @@ public class MainScreenController implements Initializable {
     }
 
     public void orgaNotes(){
+        noteField.clear();
         Document noteHtm = null;
+        float sumNotes = 0;
         float moyenne = 0;
+
         try {
             noteHtm = getHtm("https://www.pepal.eu/?my=notes");
         } catch (IOException e) {
@@ -251,29 +239,8 @@ public class MainScreenController implements Initializable {
     }
 
 
-
-
-
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
-
-
-        Runnable drawRunnable = new Runnable() {
-            @Override
-            public void run() {
-                noteField.clear();
-                orgaNotes();
-
-            }
-        };
-
-        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-
-
-        exec.scheduleAtFixedRate(drawRunnable, 0, 5, TimeUnit.SECONDS);
-
+        orgaNotes();
     }
 }
