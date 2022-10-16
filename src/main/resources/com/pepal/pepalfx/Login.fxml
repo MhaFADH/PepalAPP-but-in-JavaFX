@@ -44,7 +44,7 @@
       </AnchorPane>
       <ImageView fx:id="imageView" fitHeight="70.0" fitWidth="386.0" layoutX="107.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../../../images/sdvBanner.jpg" />
+            <Image url="@sdvBanner.jpg" />
          </image>
       </ImageView>
    </children>

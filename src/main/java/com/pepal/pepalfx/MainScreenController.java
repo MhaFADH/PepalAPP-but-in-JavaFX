@@ -210,8 +210,6 @@ public class MainScreenController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        System.out.println(noteHtm);
-
         Elements trClass = noteHtm.getElementsByClass("note_devoir");
 
         HashMap<String,String> notes = new HashMap<String, String>();

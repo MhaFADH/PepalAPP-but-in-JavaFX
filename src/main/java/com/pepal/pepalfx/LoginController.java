@@ -103,7 +103,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        File sdvBannerF = new File("images/sdvBanner.jpg");
+        File sdvBannerF = new File("src/main/resources/com/pepal/pepalfx/sdvBanner.jpg");
         Image sdvBannerI = new Image(sdvBannerF.toURI().toString());
         imageView.setImage(sdvBannerI);
     }
