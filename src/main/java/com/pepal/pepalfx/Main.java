@@ -9,7 +9,7 @@ import javafx.stage.*;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class Main extends Application {
 
 
 

@@ -20,14 +20,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
-import static com.pepal.pepalfx.LoginController.username;
-import static com.pepal.pepalfx.LoginController.password;
-import static com.pepal.pepalfx.LoginController.cookie;
-
+import static com.pepal.pepalfx.LoginController.*;
 
 
 public class MainScreenController implements Initializable {
+    Tools tools = new Tools();
+    public final String msg = "Vous avez déjà été noté présent, ou alors l'appel a été clôturé" ;
+    public final String msg1 = "l'appel a été clôturé" ;
+    public final String msg2 = "l'appel n'a pas été encore ouvert" ;
+    public final String msg3 = "Pas de cours prévu pour aujourd'hui" ;
+    public static float sumNotes;
+    public static float moyenne;
 
     @FXML
     private Button buttonAct;
@@ -38,67 +41,31 @@ public class MainScreenController implements Initializable {
     @FXML
     private TextField moyField;
 
-    public MainScreenController() throws IOException {
-    }
-
-
     public void act(ActionEvent e) throws IOException {
 
-        try {
-            Connection.Response response = Jsoup.connect("https://www.pepal.eu/include/php/ident.php")
-                    .method(Connection.Method.GET)
-                    .execute();
+        cookie = tools.connectPepal(username,password);
 
-            Document loginDoc = response.parse();
-
-            cookie = new HashMap<>(response.cookies());
-
-
-
-            HashMap<String, String> formData = new HashMap<>();
-            formData.put("login", username);
-            formData.put("pass", password);
-
-            Connection.Response homePage = Jsoup.connect("https://www.pepal.eu/include/php/ident.php")
-                    .cookies(cookie)
-                    .data(formData)
-                    .method(Connection.Method.POST)
-                    .execute();
-
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-        HelloApplication helloApplication = new HelloApplication();
+        Main mainn = new Main();
 
         Stage stage = (Stage) buttonAct.getScene().getWindow();
         stage.close();
 
-        helloApplication.mainScreen(new Stage());
-        orgaNotes();
-
-
+        mainn.mainScreen(new Stage());
+        tools.orgaNotes(noteField,moyField,sumNotes,moyenne);
 
 
     }
 
-    public Document getHtm(String url) throws IOException {
-        Connection.Response page = Jsoup.connect(url)
-                .method(Connection.Method.GET)
-                .cookies(cookie)
-                .execute();
 
-        return page.parse();
-
-    }
 
 
     public void pres(ActionEvent e) throws IOException {
-        String msg = "Vous avez déjà été noté présent, ou alors l'appel a été clôturé" ;
+
 
         Document presPage;
+
         try {
-            presPage = getHtm("https://www.pepal.eu/presences");
+            presPage = tools.getHtml("https://www.pepal.eu/presences");
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -113,9 +80,16 @@ public class MainScreenController implements Initializable {
         }
 
         Elements noCours = presPage.getElementsByClass("alert alert-danger");
+        String matin = "";
+        String aprem = "";
 
-        String matin = hrefLinks[0].attr("href").replace("/presences/s/","");
-        String aprem = hrefLinks[1].attr("href").replace("/presences/s/","");
+        if(noCours.text().contains("Pas de cours de prévu")){
+        }else{
+            matin = hrefLinks[0].attr("href").replace("/presences/s/","");
+            aprem = hrefLinks[1].attr("href").replace("/presences/s/","");
+        }
+
+
 
 
 
@@ -130,10 +104,12 @@ public class MainScreenController implements Initializable {
 
         Document matinPres;
         Document apremPres;
+        Document pasCours;
 
         try {
-            matinPres = getHtm("https://www.pepal.eu/presences/s/"+matin);
-            apremPres = getHtm("https://www.pepal.eu/presences/s/"+aprem);
+            matinPres = tools.getHtml("https://www.pepal.eu/presences/s/"+matin);
+            apremPres = tools.getHtml("https://www.pepal.eu/presences/s/"+aprem);
+            pasCours = tools.getHtml("https://www.pepal.eu/presences");
 
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -145,6 +121,8 @@ public class MainScreenController implements Initializable {
         Elements apremResult = apremPres.getElementsByClass("alert alert-success");
         Elements apremResult1 = apremPres.getElementsByClass("alert alert-danger");
 
+        Elements pacC = pasCours.getElementsByClass("alert alert-danger");
+
         SimpleDateFormat sdf =new SimpleDateFormat("HH:mm");
 
         Date limitTime;
@@ -155,12 +133,14 @@ public class MainScreenController implements Initializable {
         }
         Date currentDate = new Date();
         if(currentDate.getHours() > limitTime.getHours()){
-            if(apremResult.text().contains("Vous avez été noté présent le")||apremResult1.text().contains("L'appel est clôturé")|| apremResult1.text().contains(" L'appel n'est pas encore ouvert")) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Validation failed");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
+            if(apremResult.text().contains("Vous avez été noté présent le")){
+                alert(msg);
+            }else if(apremResult1.text().contains("L'appel est clôturé")){
+                alert(msg1);
+            }else if(apremResult1.text().contains(" L'appel n'est pas encore ouvert")){
+                alert(msg2);
+            }else if(pacC.text().contains("Pas de cours de prévu")){
+                alert(msg3);
             }else{
                 try {
                     Connection.Response prespge = Jsoup.connect("https://www.pepal.eu/student/upload.php")
@@ -173,13 +153,19 @@ public class MainScreenController implements Initializable {
                     throw new RuntimeException(ex);
                 }
             }
+
+
+
+
         }else{
-            if(matinResult.text().contains("Vous avez été noté présent le")||matinResult1.text().contains("L'appel est clôturé")|| matinResult1.text().contains(" L'appel n'est pas encore ouvert")){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Validation failed");
-                alert.setHeaderText(null);
-                alert.setContentText(msg);
-                alert.showAndWait();
+            if(matinResult.text().contains("Vous avez été noté présent le")){
+                alert(msg);
+            }else if(matinResult1.text().contains("L'appel est clôturé")){
+                alert(msg1);
+            }else if(matinResult1.text().contains(" L'appel n'est pas encore ouvert")){
+                alert(msg2);
+            }else if(pacC.text().contains("Pas de cours de prévu")){
+                alert(msg3);
             }else{
                 try {
                     Connection.Response prespge = Jsoup.connect("https://www.pepal.eu/student/upload.php")
@@ -198,47 +184,22 @@ public class MainScreenController implements Initializable {
 
     }
 
-    public void orgaNotes(){
-        noteField.clear();
-        Document noteHtm = null;
-        float sumNotes = 0;
-        float moyenne = 0;
-
-        try {
-            noteHtm = getHtm("https://www.pepal.eu/?my=notes");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Elements trClass = noteHtm.getElementsByClass("note_devoir");
-
-        HashMap<String,String> notes = new HashMap<String, String>();
-        List<String> tabloNotes = new ArrayList<>();
-
-        for(Element ele:trClass){
-            String titreNote = ele.child(0).text().replace(" PUBLIE","");
-            String note = ele.child(3).text();
-            tabloNotes.add(titreNote +":  "+ note);
-            sumNotes += Double.parseDouble(note);
-
-        }
-
-        moyenne = sumNotes / tabloNotes.size();
-
-
-        for(String ele:tabloNotes){
-            noteField.appendText(ele+"\n");
-
-        }
-
-        moyField.setText("Moyenne generale: "+ moyenne);
-
-
+    public void alert(String msg){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Validation failed");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
+
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        orgaNotes();
+        try {
+            tools.orgaNotes(noteField,moyField,sumNotes,moyenne);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

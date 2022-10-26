@@ -2,40 +2,28 @@ package com.pepal.pepalfx;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
-import java.io.File;
 import java.io.IOException;
+
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
-
+public class LoginController{
+    Tools tools = new Tools();
     public static String username = "";
     public static String password = "";
-
-    public static HashMap<String,String> cookie = new HashMap<>();
-
+    public static HashMap<String,String> cookie;
 
     @FXML
-    private ImageView imageView;
+    private Label sdvLabel;
     @FXML
     private PasswordField passwordField;
     @FXML
@@ -45,67 +33,37 @@ public class LoginController implements Initializable {
     @FXML
     private Label errorLabel;
 
+    public LoginController(){
+    }
 
-    public void login(ActionEvent e){
+    public void login(ActionEvent e) throws IOException, InterruptedException {
+
         loginButton.setDisable(true);
         username = usernameField.getText();
         password = passwordField.getText();
-
-        try{
-
-            Connection.Response response = Jsoup.connect("https://www.pepal.eu/include/php/ident.php")
-                    .method(Connection.Method.GET)
-                    .execute();
-
-            Document loginDoc = response.parse();
-
-            cookie = new HashMap<>(response.cookies());
-
-
-
-            HashMap<String, String> formData = new HashMap<>();
-            formData.put("login", username);
-            formData.put("pass", password);
-
-            Connection.Response homePage = Jsoup.connect("https://www.pepal.eu/include/php/ident.php")
-                    .cookies(cookie)
-                    .data(formData)
-                    .method(Connection.Method.POST)
-                    .execute();
-            Elements doc = homePage.parse().getElementsByTag("p");
-
-            if(doc.text().contains("Redirection dans : ")){
-                Stage stgActuel = (Stage) loginButton.getScene().getWindow();
-                stgActuel.close();
-
-                HelloApplication helloApplication = new HelloApplication();
-                helloApplication.mainScreen(new Stage());
+        cookie = tools.connectPepal(usernameField.getText(),passwordField.getText());
 
 
 
 
+        if(cookie == null){
 
-            }else {
-                errorLabel.setVisible(true);
-                loginButton.setDisable(false);
-            }
+            errorLabel.setVisible(true);
+            loginButton.setDisable(false);
 
+        }else {
+            loginButton.setDisable(true);
+            Stage stgActuel = (Stage) loginButton.getScene().getWindow();
+            stgActuel.close();
+            Main mainn = new Main();
+            mainn.mainScreen(new Stage());
 
-        }catch(Exception ex){
-            ex.printStackTrace();
         }
 
 
 
     }
 
-    private Button button;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        File sdvBannerF = new File("src/main/resources/com/pepal/pepalfx/sdvBanner.jpg");
-        Image sdvBannerI = new Image(sdvBannerF.toURI().toString());
-        imageView.setImage(sdvBannerI);
-    }
 
 }
