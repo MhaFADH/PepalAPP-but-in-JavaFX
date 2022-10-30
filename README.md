@@ -13,6 +13,6 @@ Service Layer:
 Librairie externe:
 - Jsoup pour les requêtes
 
-Dépendences(Maven):
+Dépendence(Maven):
 - RxJava (J'ai tenté de simplifier mon code avec du ReactiveX mais sans résultat, j'ai quand même laissé en commentaire la tentative(dans tools.java ligne 82))
 
